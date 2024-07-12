@@ -16,7 +16,7 @@ export function PrintDialog() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Print Doc</Button>
+        <Button variant="outline" size={"sm"}>Print Doc</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
