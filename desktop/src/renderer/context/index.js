@@ -76,7 +76,7 @@ const connectors = connectorsForWallets(
 
 const config = createConfig({
     connectors,
-    projectId: 'YOUR_PROJECT_ID',
+    projectId: '925ec9b5e040ff21f94ceb2ee69d011a',
     chains: [celo, celoAlfajores, localhost],
     ssr: true, // If your dApp uses server side rendering (SSR)
 });

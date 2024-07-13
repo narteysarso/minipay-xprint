@@ -13,7 +13,6 @@ import { labels, statuses } from "../../../data/data"
 import { Task } from "../../../data/schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Button } from "@/components/ui/button"
 
 export const columns: ColumnDef<Task>[] = [
   {

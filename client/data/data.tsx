@@ -70,17 +70,23 @@ export const priorities = [
   },
 ]
 
+export const cUSDAddress = process.env.NEXT_PUBLIC_CUSD_STABLE_TOKEN_ADDRESS;
 export const printTypes = [
   {
-    value: "monochrome", label: "Black & White", price: '0.002', token: {
+    value: "monochrome",
+    label: "Black & White",
+    price: '0.002', token: {
       'name': 'cUSD',
-      'address': "",
+      'address': cUSDAddress,
     }
   },
   {
-    value: "color", label: "Color", price: '0.02', token: {
+    value: "color",
+    label: "Color",
+    price: '0.02',
+    token: {
       'name': 'cUSD',
-      'address': "",
+      'address':cUSDAddress,
     }
   },
 
@@ -88,17 +94,47 @@ export const printTypes = [
 
 export const bindTypes = [
   {
-    value: "staple", label: "Stapled", price: '0.00', token: {
+    value: "staple",
+    label: "Stapled",
+    price: '0.00',
+    token: {
       'name': 'cUSD',
-      'address': "",
+      'address':cUSDAddress,
       'icon': "https://s2.coinmarketcap.com/static/img/coins/64x64/7236.png"
     }
   },
   {
-    value: "bind", label: "Bind", price: '0.1', token: {
+    value: "bind",
+    label: "Bind",
+    price: '0.01',
+    token: {
       'name': 'cUSD',
-      'address': "",
+      'address':cUSDAddress,
       'icon': "https://s2.coinmarketcap.com/static/img/coins/64x64/7236.png"
     }
   },
+]
+
+export const DummyPrinters = [
+  {
+    hash: 'hash1',
+    name: 'Printer Shop',
+    description: '',
+    latitude: 6.660378631906318,
+    longitude: -1.563429887020611
+  },
+  {
+    hash: 'hash2',
+    name: 'Printer Shop1',
+    description: '',
+    latitude: 6.660663691270679,
+    longitude: -1.5630275556879887
+  },
+  {
+    hash: 'hash3',
+    name: 'Printer Shop 3',
+    description: '',
+    latitude: 6.660389288334144,
+    longitude: -1.562209481978323
+  }
 ]

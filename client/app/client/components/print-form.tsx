@@ -17,54 +17,76 @@ import {
 import { toast } from "@/components/ui/use-toast"
 import CustomInput from "./CustomInput"
 import CustomSelect from "./CustomSelect"
-import { bindTypes, printTypes } from "../../../data/data"
+import { bindTypes, DummyPrinters, printTypes } from "../../../data/data"
 import { usePrint } from "@/hooks/print-data-hook"
 import { PrintersMap } from "./printers-map"
+import { getPDFPageCount } from "@/lib/utils"
+import { PrintFormSchema } from "@/data/schema"
 
-export const FormSchema = z.object({
-    name: z.string().min(2, {
-        message: "Username must be at least 2 characters.",
-    }).optional(),
-    printType: z.string(),
-    bindType: z.string(),
-    file: z.string(),
-    deliveryType: z.string().optional(),
-    pickup: z.array().optional(),
-    deliveryFee: z.number().optional()
-})
 
 export function PrintForm() {
-    const { printFormData, setPrintFormData, formStep } = usePrint();
+    const { printFormData, setPrintFormData, formStep, setForm, setSelectedPrinter } = usePrint();
     const { file, ...printInfo } = printFormData;
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+
+    const form = useForm<z.infer<typeof PrintFormSchema>>({
+        resolver: zodResolver(PrintFormSchema),
         defaultValues: {
             ...printInfo,
         },
+        values: {
+            ...printInfo
+        }
     })
 
-    function onSubmit(data: z.infer<typeof FormSchema>) {
-        alert('saving...');
-        setPrintFormData(data);
-        toast({
-            title: "You submitted the following values:",
-            description: (
-                <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                    <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-        })
-    }
+    setForm(form);
 
+    // function onSubmit(data: z.infer<typeof FormSchema>) {
+    //     alert('saving...');
+    //     // setPrintFormData(data);
+    //     toast({
+    //         title: "You submitted the following values:",
+    //         description: (
+    //             <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
+    //                 <code className="text-white">{JSON.stringify(data, null, 2)}</code>
+    //             </pre>
+    //         ),
+    //     })
+    // }
+
+    const handleOnChange = (event) => {
+        console.log('trigger')
+        if (event.target.name === "file") {
+            const file = event.target.files[0];
+            
+
+            if (!file) {
+                setPrintFormData({ [event.target.name]: file, pageCount: 0 });
+                form.resetField(file, {
+
+                });
+                return;
+            }
+
+            getPDFPageCount(file).then(pageCount => {
+                setPrintFormData({ [event.target.name]: file, pageCount });
+            });
+
+            return;
+        }
+
+
+        setPrintFormData({ [event.target.name]: event.target.value });
+    }
     return (
         <div className="w-full">
             <Form {...form} >
-                <form onSubmit={form.handleSubmit(onSubmit)} onChange={(event) => console.log(event.target.name)} className="w-full space-y-6">
+                <form onChange={handleOnChange} className="w-full space-y-6">
                     {
                         formStep == 1 && (
                             <>
                                 <CustomInput label="Name" name="name" placeholder="File name" control={form.control} inputType="text" />
-                                <CustomInput label="Document" name="file" placeholder="Select document" control={form.control} file={file} inputType="file" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.slideshow, application/vnd.openxmlformats-officedocument.presentationml.presentation" />
+                                {/* <CustomInput label="Document" name="file" placeholder="Select document" control={form.control} inputType="file" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document, application/vnd.ms-powerpoint, application/vnd.openxmlformats-officedocument.presentationml.slideshow, application/vnd.openxmlformats-officedocument.presentationml.presentation" /> */}
+                                <CustomInput label="Document" name="file" placeholder="Select document" control={form.control} inputType="file" accept="application/pdf" />
                                 {/* <CustomInput name="name" placeholder="File name" control={form.control} inputType="text" /> */}
                                 <CustomSelect label="Print Type" name="printType" placeholder="Select print type" control={form.control} selectInputs={printTypes} />
                                 <CustomSelect label="Binding Type" name="bindType" placeholder="Select print type" control={form.control} selectInputs={bindTypes} />
@@ -75,15 +97,13 @@ export function PrintForm() {
                                         <AvatarFallback>CN</AvatarFallback>
                                     </Avatar>
                                 </div>
-
-                                {/* <Button type="submit">Next</Button> */}
                             </>
                         )
                     }
 
                     {
                         formStep == 2 && (
-                            <PrintersMap />
+                            <PrintersMap coordinates={DummyPrinters} onSelect={(v) => { setSelectedPrinter(v) }} />
                         )
                     }
 
