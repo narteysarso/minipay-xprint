@@ -6,8 +6,7 @@ export const taskSchema = z.object({
   id: z.string(),
   title: z.string(),
   status: z.string(),
-  label: z.string(),
-  priority: z.string(),
+  label: z.string()
 })
 
 export const MAX_UPLOAD_SIZE = 1024 * 1024 * 3; // 3MB

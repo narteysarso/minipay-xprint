@@ -60,10 +60,10 @@ export function PrintDialog() {
 		try {
 			const result = PrintFormSchema.parse(printFormData);
 			const cost = parseUnits(result?.cost as string, parseInt(process.env.NEXT_PUBLIC_TOKEN_DECIMALS as string));
-			if(balance < cost) {
-				setShowNotEnoughBalance(true);
-				return;
-			}
+			// if(balance < cost) {
+			// 	setShowNotEnoughBalance(true);
+			// 	return;
+			// }
 			formNextStep()
 		} catch (error) {
 			console.log(error)

@@ -1,7 +1,10 @@
+import { PrintProvider } from "@/hooks/print-data-hook"
 import Dashboard from "./dashboard"
 
 export default function Page() {
   return (
-   <Dashboard />
+    <PrintProvider>
+      <Dashboard />
+    </PrintProvider>
   )
 }

@@ -11,10 +11,11 @@ export default function PrinterSettings() {
     const { printer: selectedPrinter, savePrinter } = useContext(PrinterSettingContext);
 
     useEffect(() => {
-
+        console.log('getting printers')
         if ( window.electron.ipcRenderer) {
             window.electron.ipcRenderer.sendMessage("get_printers");
             window.electron.ipcRenderer.on("printers_list", (event, { printers }) => {
+                console.log('printers', printers);
                 setPrinters(printers.map((printer) => printer.name));
             });
         }

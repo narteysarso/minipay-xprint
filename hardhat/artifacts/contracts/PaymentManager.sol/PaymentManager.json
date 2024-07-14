@@ -1,0 +1,93 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "PaymentManager",
+  "sourceName": "contracts/PaymentManager.sol",
+  "abi": [
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "printHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "PaymentLocked",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "bytes32",
+          "name": "printHash",
+          "type": "bytes32"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "RefundRequested",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "getPaymentToken",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes32",
+          "name": "printHash",
+          "type": "bytes32"
+        }
+      ],
+      "name": "getPrintBalance",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x608060405260008060006101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff16021790555034801561005157600080fd5b506101fd806100616000396000f3fe608060405234801561001057600080fd5b50600436106100365760003560e01c80633bbc4d341461003b578063d41c3a651461006b575b600080fd5b6100556004803603810190610050919061010a565b610089565b6040516100629190610150565b60405180910390f35b6100736100a6565b60405161008091906101ac565b60405180910390f35b600060016000838152602001908152602001600020549050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b600080fd5b6000819050919050565b6100e7816100d4565b81146100f257600080fd5b50565b600081359050610104816100de565b92915050565b6000602082840312156101205761011f6100cf565b5b600061012e848285016100f5565b91505092915050565b6000819050919050565b61014a81610137565b82525050565b60006020820190506101656000830184610141565b92915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006101968261016b565b9050919050565b6101a68161018b565b82525050565b60006020820190506101c1600083018461019d565b9291505056fea2646970667358221220f73d209eb57e53a5970d4c19ffca4085c003c69ae1dc868d855b35854e6ba75164736f6c63430008140033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100365760003560e01c80633bbc4d341461003b578063d41c3a651461006b575b600080fd5b6100556004803603810190610050919061010a565b610089565b6040516100629190610150565b60405180910390f35b6100736100a6565b60405161008091906101ac565b60405180910390f35b600060016000838152602001908152602001600020549050919050565b60008060009054906101000a900473ffffffffffffffffffffffffffffffffffffffff16905090565b600080fd5b6000819050919050565b6100e7816100d4565b81146100f257600080fd5b50565b600081359050610104816100de565b92915050565b6000602082840312156101205761011f6100cf565b5b600061012e848285016100f5565b91505092915050565b6000819050919050565b61014a81610137565b82525050565b60006020820190506101656000830184610141565b92915050565b600073ffffffffffffffffffffffffffffffffffffffff82169050919050565b60006101968261016b565b9050919050565b6101a68161018b565b82525050565b60006020820190506101c1600083018461019d565b9291505056fea2646970667358221220f73d209eb57e53a5970d4c19ffca4085c003c69ae1dc868d855b35854e6ba75164736f6c63430008140033",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}

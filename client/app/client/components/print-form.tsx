@@ -25,7 +25,7 @@ import { PrintFormSchema } from "@/data/schema"
 
 
 export function PrintForm() {
-    const { printFormData, setPrintFormData, formStep, setForm, setSelectedPrinter } = usePrint();
+    const { printFormData, setPrintFormData, formStep, setForm, setSelectedPrinter, printers } = usePrint();
     const { file, ...printInfo } = printFormData;
 
     const form = useForm<z.infer<typeof PrintFormSchema>>({
@@ -40,18 +40,6 @@ export function PrintForm() {
 
     setForm(form);
 
-    // function onSubmit(data: z.infer<typeof FormSchema>) {
-    //     alert('saving...');
-    //     // setPrintFormData(data);
-    //     toast({
-    //         title: "You submitted the following values:",
-    //         description: (
-    //             <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-    //                 <code className="text-white">{JSON.stringify(data, null, 2)}</code>
-    //             </pre>
-    //         ),
-    //     })
-    // }
 
     const handleOnChange = (event) => {
         console.log('trigger')
@@ -103,7 +91,7 @@ export function PrintForm() {
 
                     {
                         formStep == 2 && (
-                            <PrintersMap coordinates={DummyPrinters} onSelect={(v) => { setSelectedPrinter(v) }} />
+                            <PrintersMap coordinates={printers} onSelect={(v) => { setSelectedPrinter(v) }} />
                         )
                     }
 

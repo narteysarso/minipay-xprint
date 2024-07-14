@@ -23,7 +23,15 @@ export const labels = [
     label: "Documentation",
   },
 ]
-
+export const jobStatuses = [
+  "None",
+  "pending",
+  "in progress",
+  "done",
+  "backlog",
+  "canceled",
+  "OwnerCancelRequest"
+]
 export const statuses = [
   {
     value: "backlog",
@@ -31,8 +39,8 @@ export const statuses = [
     icon: QuestionMarkCircledIcon,
   },
   {
-    value: "todo",
-    label: "Todo",
+    value: "pending",
+    label: "Pending",
     icon: CircleIcon,
   },
   {
@@ -83,10 +91,10 @@ export const printTypes = [
   {
     value: "color",
     label: "Color",
-    price: '0.02',
+    price: '0.005',
     token: {
       'name': 'cUSD',
-      'address':cUSDAddress,
+      'address': cUSDAddress,
     }
   },
 
@@ -99,17 +107,17 @@ export const bindTypes = [
     price: '0.00',
     token: {
       'name': 'cUSD',
-      'address':cUSDAddress,
+      'address': cUSDAddress,
       'icon': "https://s2.coinmarketcap.com/static/img/coins/64x64/7236.png"
     }
   },
   {
     value: "bind",
     label: "Bind",
-    price: '0.01',
+    price: '0.001',
     token: {
       'name': 'cUSD',
-      'address':cUSDAddress,
+      'address': cUSDAddress,
       'icon': "https://s2.coinmarketcap.com/static/img/coins/64x64/7236.png"
     }
   },

@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { getLocalPrinters, printLocal } from './printer';
 
 class AppUpdater {
   constructor() {
@@ -30,6 +31,28 @@ ipcMain.on('ipc-example', async (event, arg) => {
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
 });
+
+ipcMain.on('get_printers', async (event) => {
+  console.log('main printers')
+  const printers = await getLocalPrinters();
+  console.log(printers);
+  event.reply('printers_list', { printers });
+});
+
+ipcMain.on('print_doc', async (event, printInfo = { url, options: {} }) => {
+
+  console.log(printInfo)
+
+  try {
+    // event.sender.send("printer_message", "printing");
+    await printLocal(printInfo['url'], printInfo['options']);
+    event.sender.send("printer_message", "print done");
+  } catch (error) {
+    event.reply("printer_error", error);
+  }
+
+});
+
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');

@@ -1,12 +1,21 @@
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { getContract, formatEther, createPublicClient, http, erc20Abi, Chain, encodeFunctionData, parseUnits } from "viem";
+import { getContract, formatEther, createPublicClient, http, erc20Abi, Chain, encodeFunctionData, parseUnits, keccak256, stringToBytes, parseAbi } from "viem";
 import { createWalletClient, custom } from 'viem'
-import { PageSizes, PDFDocument } from 'pdf-lib';
+import { PDFDocument } from 'pdf-lib';
+import {abi as xprintAbi, address as xprintAddress } from "@/data/xprint-abi";
+import { celo, celoAlfajores } from "viem/chains";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export const chain = process.env.NODE_ENV === "production" ? celo : celoAlfajores;
+
+export  const publicClient = createPublicClient({
+    chain,
+    transport: http(),
+  });
 
 export const getAddress = async () => {
   // The code must run in a browser environment and not in node environment
@@ -37,10 +46,6 @@ export const getAddresscUSDBalance = async (address: `0x${string}`, chain: Chain
 
   const STABLE_TOKEN_ADDRESS = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 
-  const publicClient = createPublicClient({
-    chain,
-    transport: http(),
-  });
   let StableTokenContract = getContract({
     abi: erc20Abi,
     address: STABLE_TOKEN_ADDRESS,
@@ -109,11 +114,7 @@ export const transfercUSDFrom = async({fromAddress, tokenAddress, toAddress, tok
     transport: custom(window.ethereum!)
   })
   
-  const publicClient = createPublicClient({ 
-    chain,
-    // chain: celo,
-    transport: http()
-  })
+
   let hash = await client.sendTransaction({
     account: toAddress,
     to: tokenAddress,
@@ -148,7 +149,7 @@ export const transfercUSDFrom = async({fromAddress, tokenAddress, toAddress, tok
   }
 }
 
-export const readFile = (file) : Promise<ArrayBuffer|string|null>  => {
+export const readFile = (file: File) : Promise<ArrayBuffer|string|null>  => {
 
   return new Promise((resolve, reject) => {
 
@@ -161,7 +162,52 @@ export const readFile = (file) : Promise<ArrayBuffer|string|null>  => {
   });
 }
 
-export const getPDFPageCount = async (file) => {
+export const getHash = (str: string) => {
+  return keccak256(stringToBytes(str));
+}
+
+
+export const getPrinterLogs = async() => {
+
+  const events = await publicClient.getContractEvents({
+    abi: xprintAbi,
+    address: xprintAddress,
+    eventName: 'PrinterCreated',
+    fromBlock: 0n,
+  })
+  
+  const printersLog = events?.map(event => event?.args);
+  
+  return printersLog;
+}
+
+export const getPrintStatus = async(printHash: `$0x${string}`) => {
+  
+  const result =  await publicClient.readContract({
+    abi: xprintAbi,
+    address: xprintAddress,
+    functionName: "getJobStatus",
+    args: [printHash]
+  });
+
+  return result;
+}
+
+
+export const getPrintLogs = async(address: `0x${string}`) => {
+  const events = await publicClient.getContractEvents({
+    abi: xprintAbi,
+    address: xprintAddress,
+    eventName: 'JobIssued',
+    fromBlock: 0n,
+  })
+  
+  const printLog = events?.map(event => event?.args);
+  
+  return printLog;
+}
+
+export const getPDFPageCount = async (file: File) => {
 
   const arrayBuffer = await readFile(file) as ArrayBuffer|string;
 

@@ -1,11 +1,16 @@
 'use client'
 
 import { Print, Printer, printSchema } from '@/data/schema';
-import { createContext, ReactElement, useContext, useState } from 'react'
+import { createContext, ReactElement, useContext, useEffect, useState } from 'react'
 import { useStorageUpload } from "@thirdweb-dev/react";
-import { getPDFPageCount } from '@/lib/utils';
-import { bindTypes, printTypes } from '@/data/data';
+import { getHash, getPDFPageCount, getPrinterLogs, getPrintLogs, getPrintStatus } from '@/lib/utils';
+import { bindTypes, jobStatuses, printTypes, statuses } from '@/data/data';
 import { formatUnits, parseUnits } from 'viem';
+import { useAccount, useWriteContract } from 'wagmi';
+import { abi as xprintAbi, address as xprintAddress } from "../data/xprint-abi";
+import { abi as tokenAbi, address as tokenAddress } from "../data/token-abi";
+import { useStorage } from "@thirdweb-dev/react";
+import { access } from 'fs';
 
 const PrintContext = createContext({});
 
@@ -13,6 +18,8 @@ export function usePrint() {
     const [printFormLoading, setPrintFormLoading] = useState(false)
     const printContext = useContext(PrintContext);
     const { mutateAsync: upload } = useStorageUpload();
+    const { writeContractAsync, context } = useWriteContract();
+    const { address } = useAccount();
 
     const uploadFileToIpfs = async (file: File) => {
         const uploadUrl = await upload({
@@ -32,14 +39,14 @@ export function usePrint() {
 
 
     const handlePrintSubmit = async () => {
-        
+
         try {
             setPrintFormLoading(true);
             const alldata: Print = { ...printContext.printFormData, printer: printContext.selectedPrinter };
-            console.log('all data', alldata);
+
 
             const fileUri = (await uploadFileToIpfs(alldata.file))[0];
-            console.log('fileuri', fileUri)
+
             const metadata = {
                 name: alldata?.name,
                 description: 'An Xprint service job',
@@ -75,7 +82,51 @@ export function usePrint() {
             }
             const metaDataUri = await uploadPrintMetaData(JSON.stringify(metadata), `${Date.now()}_${name}`);
 
-            console.log('metadata', metaDataUri);
+            const ipfsURI = metaDataUri[0].split('ipfs/')[1];
+            const ipfsCID = ipfsURI.substring(0, ipfsURI.length - 1);
+            // const hash = getHash(ipfsCID);
+
+            const amount = parseUnits(alldata?.cost as string, 6).toString();
+
+            // console.log('metadata', {
+            //     ipfsCID,
+            //     // hash,
+            //     printerHash: alldata.printer.hash,  //getHash("bafybeievnpzdcvmw63bg6hlfzknxuufiasbbgye3s7sjyudmjtzrrr3xci"),
+            //     amount,
+            // });
+
+            const txn = await writeContractAsync({
+                abi: tokenAbi,
+                address: tokenAddress,
+                functionName: 'approve',
+                args: [
+                    xprintAddress,
+                    amount
+                ],
+
+            }, {
+                onSuccess(data, variables, context) {
+                    writeContractAsync({
+                        abi: xprintAbi,
+                        address: xprintAddress,
+                        functionName: 'issuePrint',
+                        args: [
+                            alldata.printer.hash,
+                            address,
+                            amount,
+                            ipfsCID,
+                        ],
+                    }, {
+                        onSuccess(data, variables, context) {
+                            console.log(data);
+                        },
+                    })
+
+
+                },
+            });
+
+            // console.log(txn);
 
             //TODO: send payment to smart contract wallet
 
@@ -83,7 +134,7 @@ export function usePrint() {
 
             }
         } catch (error) {
-
+            console.log(error);
         } finally {
             setPrintFormLoading(false);
         }
@@ -110,9 +161,13 @@ export function PrintProvider({ children }: { children: ReactElement }) {
     });
 
     const [selectedPrinter, _setSelectedPrinter] = useState(null);
+    const [printers, setPrinters] = useState([]);
+    const [prints, setPrints] = useState([]);
     const [printData, _setPrintData] = useState([]);
     const [formStep, setFormStep] = useState(1);
     const [form, setForm] = useState(null);
+    const storage = useStorage();
+    const {address} = useAccount()
 
     const setPrintFormData = (newFieldData: {}) => {
         //TODO: validate data;
@@ -151,6 +206,45 @@ export function PrintProvider({ children }: { children: ReactElement }) {
         setFormStep(prev => prev == 1 ? prev : --prev)
     }
 
+    useEffect(() => {
+        (async () => {
+            if(!address) return;
+            try {
+                const [printerlogs, printLogs] = await Promise.all([getPrinterLogs(), getPrintLogs(address)])
+
+                const [printers, prints] = await Promise.all(
+                    [
+                        Promise.all(printerlogs.map(async (printer) => {
+                            if (!printer?.cid) return null;
+                            const dt = await storage?.downloadJSON(`ipfs://${printer?.cid}`)
+                            if (dt.error) return null;
+                            const { company: name, location } = dt.attributes?.reduce((acc, cur, next) => ({ ...acc, [cur.trait]: cur.value }), {})
+        
+                            return { name, longitude: parseFloat(location?.longitude), latitude: parseFloat(location?.latitude), hash: printer?.printerHash };
+                        })),
+
+                        Promise.all(printLogs.map(async (print) => {
+                            if(!print?.docHash || !print?.printHash) return null;
+                            const [dt, statusIdx] = await Promise.all([storage?.downloadJSON(`ipfs://${print?.docHash}`), getPrintStatus(print?.printHash)]);
+                            const { cost, token} = dt.attributes?.reduce((acc, cur, arr) => ({...acc, [cur.name]: cur.value}), {});
+                            return {id: print.printHash, title: dt.name, cost, token, label: 'document', status: jobStatuses[statusIdx]}
+                        }))
+                        
+                    ]
+
+                )
+
+                setPrinters(printers.filter((printer) => printer));
+                setPrints(prints.filter((print) => print));
+            } catch (error) {
+                console.log(error)
+            } finally {
+
+            }
+
+        })()
+    }, [])
+
     return (
         <PrintContext.Provider value={{
             printFormData,
@@ -158,6 +252,8 @@ export function PrintProvider({ children }: { children: ReactElement }) {
             formStep,
             form,
             selectedPrinter,
+            printers,
+            prints,
             setForm,
             formNextStep,
             formPrevStep,
