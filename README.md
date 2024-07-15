@@ -37,9 +37,12 @@ Xprints architecture are made up of the following parts
 - Minipay
 - Solidity
 - electron
-- google map
+- Maps - Mapbox
 
 ## Resource
 - Live url: https://minipay-xprint.vercel.app/
 - Presentation: https://docs.google.com/presentation/d/1v7b2H6I1nkVh9ws97j2os8fUIsxQzhFet4vwQSSS5sg/edit?usp=sharing
+
+## Future Works
+- 
 
