@@ -23,3 +23,17 @@ Xprints architecture are made up of the following parts
 1. A printing service provider (SME) register on the system using the desktop up and indicates the services it will provider
 2. An Xprint users via Minipay can request for a printing service, and make payments to a vault. 
 3. Once the printing services is processed and printed, the vault releases the payment to the service provider, and the user gets his/her document by delivery or pickup
+
+## Folders and Structure
+- client: holds all minipay dapp codes
+- desktop: holds electron desktop dapp
+- hardhat: holds smartcontract and deployment codes
+
+## Technology used
+- Next JS
+- Rainbowkit
+- Hardhat
+- Ant Design
+- Minipay
+- Solidity
+- 
