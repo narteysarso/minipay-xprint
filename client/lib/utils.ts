@@ -254,7 +254,7 @@ export const getHash = (str: string) => {
 
 
 export const getPrinterLogs = async () => {
-  console.log('getting printers logs at :',xprintAddress)
+  console.log('getting printers logs at :',xprintAddress, ' chain: ', chain.id)
 
   const events = await publicClient.getContractEvents({
     abi: xprintAbi,
