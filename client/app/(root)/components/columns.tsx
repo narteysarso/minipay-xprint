@@ -48,7 +48,7 @@ export const columns: ColumnDef<Task>[] = [
       <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-        <div className="text-sm font-semibold">{`${row.getValue("id")?.substr(0,1)}...${row.getValue("id")?.substr((row.getValue.length - 2),1)}`}</div>
+        <div className="text-sm font-semibold">{`${row.getValue("id")?.substring(0,1)}...${row.getValue("id")?.substring((row.getValue.length - 2),1)}`}</div>
         </TooltipTrigger>
         <TooltipContent>
           <p>{row.getValue("id")}</p>

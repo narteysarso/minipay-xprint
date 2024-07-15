@@ -3,13 +3,13 @@ import { FormControl, FormField, FormLabel, FormMessage } from '@/components/ui/
 import { Input } from '@/components/ui/input'
 import { Control, FieldPath } from 'react-hook-form'
 import { z } from 'zod'
-import {FormSchema} from "./print-form";
 import { cn } from '@/lib/utils'
+import { PrintFormSchema } from '@/data/schema'
 
 interface CustomInput { 
-    control: Control<z.infer<typeof FormSchema>>, 
+    control: Control<z.infer<typeof PrintFormSchema>>, 
     label: string, 
-    name: FieldPath<z.infer<typeof FormSchema>>, 
+    name: FieldPath<z.infer<typeof PrintFormSchema>>, 
     placeholder: string, 
     inputType?: string,
     className?: string

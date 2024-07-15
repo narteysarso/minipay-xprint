@@ -9,13 +9,13 @@ import {
 } from "@/components/ui/select"
 import { Control, FieldPath } from 'react-hook-form'
 import { z } from 'zod'
-import { FormSchema } from "./print-form";
 import { cn } from '@/lib/utils'
+import { PrintFormSchema } from '@/data/schema'
 
 interface CustomSelect {
-    control: Control<z.infer<typeof FormSchema>>,
+    control: Control<z.infer<typeof PrintFormSchema>>,
     label: string,
-    name: FieldPath<z.infer<typeof FormSchema>>,
+    name: FieldPath<z.infer<typeof PrintFormSchema>>,
     selectInputs: Array<{ value: string, label: string }>,
     placeholder: string,
     className?: string
