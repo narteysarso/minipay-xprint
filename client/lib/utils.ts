@@ -7,6 +7,8 @@ import { PDFDocument } from 'pdf-lib';
 import { abi as xprintAbi, address as xprintAddress } from "@/data/xprint-abi";
 import { celo, celoAlfajores } from "viem/chains";
 
+export const maxDuration = 60;
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }

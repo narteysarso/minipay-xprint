@@ -15,8 +15,7 @@ import { useMiniPay } from './minipay-provider';
 
 const PrintContext = createContext({});
 
-export const maxDuration = 60
-;
+export const maxDuration = 60;
 export function usePrint() {
     const [printFormLoading, setPrintFormLoading] = useState(false)
     const printContext = useContext(PrintContext);
