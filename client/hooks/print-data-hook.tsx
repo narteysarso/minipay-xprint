@@ -4,13 +4,12 @@ import { Print, Printer, printSchema } from '@/data/schema';
 import { createContext, ReactElement, useContext, useEffect, useState } from 'react'
 import { useStorageUpload } from "@thirdweb-dev/react";
 import { approvecUSD, getHash, getPDFPageCount, getPrinterLogs, getPrintLogs, getPrintStatus, issuePrintMinipay } from '@/lib/utils';
-import { bindTypes, jobStatuses, printTypes, statuses } from '@/data/data';
+import { bindTypes, cUSDAddress, jobStatuses, printTypes, statuses } from '@/data/data';
 import { formatUnits, parseUnits } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
 import { abi as xprintAbi, address as xprintAddress } from "../data/xprint-abi";
 import { abi as tokenAbi, address as tokenAddress } from "../data/token-abi";
 import { useStorage } from "@thirdweb-dev/react";
-import { access } from 'fs';
 import { useMiniPay } from './minipay-provider';
 
 const PrintContext = createContext({});
@@ -72,7 +71,7 @@ export function usePrint() {
                     },
                     {
                         name: 'token',
-                        value: process.env.NEXT_PUBLIC_CUSD_STABLE_TOKEN_ADDRESS
+                        value: cUSDAddress
                     },
 
                     {

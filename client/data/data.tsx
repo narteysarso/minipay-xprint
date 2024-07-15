@@ -78,7 +78,8 @@ export const priorities = [
   },
 ]
 
-export const cUSDAddress = process.env.NEXT_PUBLIC_CUSD_STABLE_TOKEN_ADDRESS;
+export const cUSDAddress = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_CUSD_STABLE_TOKEN_ADDRESS : process.env.NEXT_PUBLIC_STABLE_TOKEN_ADDRESS;
+
 export const printTypes = [
   {
     value: "monochrome",
