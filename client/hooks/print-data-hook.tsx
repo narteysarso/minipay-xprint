@@ -15,6 +15,8 @@ import { useMiniPay } from './minipay-provider';
 
 const PrintContext = createContext({});
 
+export const maxDuration = 60
+;
 export function usePrint() {
     const [printFormLoading, setPrintFormLoading] = useState(false)
     const printContext = useContext(PrintContext);
@@ -86,16 +88,8 @@ export function usePrint() {
 
             const ipfsURI = metaDataUri[0].split('ipfs/')[1];
             const ipfsCID = ipfsURI.substring(0, ipfsURI.length - 1);
-            // const hash = getHash(ipfsCID);
-
+            
             const amount = parseUnits(alldata?.cost as string, process.env.NEXT_PUBLIC_TOKEN_DECIMALS).toString();
-
-            // console.log('metadata', {
-            //     ipfsCID,
-            //     // hash,
-            //     printerHash: alldata.printer.hash,  //getHash("bafybeievnpzdcvmw63bg6hlfzknxuufiasbbgye3s7sjyudmjtzrrr3xci"),
-            //     amount,
-            // });
 
             if (window && window.ethereum) {
                 // User has a injected wallet
