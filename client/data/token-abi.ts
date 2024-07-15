@@ -1,4 +1,4 @@
-export const address = "0x722eC3feF48FfBACF6F92622709E2cC3BC6eB3F0";
+export const address = process.env.NEXT_PUBLIC_STABLE_TOKEN_ADDRESS;
 
 export const abi = [
 	{

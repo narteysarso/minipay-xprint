@@ -1,4 +1,4 @@
-export const address = "0xe73bd2F08f96e696E5fe6D5e77080356672DcA64";
+export const address = process.env.NEXT_PUBLIC_XPRINT_CONTRACT_ADDRESS;
 
 export const abi =  [
     {
