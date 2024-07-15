@@ -9,10 +9,17 @@ To enhance customer satisfaction and encourage repeat business, XPrint features 
 
 Xprints architecture are made up of the following parts
     
-    - Celo blockchain: all transactions occur on the blockchain. These includes printing service registration, printing services request, payments, and loyalty rewards tokens.
 
-    - IPFS: Stores all data including printing service provder, printing requests, and documents.
+- Celo blockchain: all transactions occur on the blockchain. These includes printing service registration, printing services request, payments, and loyalty rewards tokens.
 
-    - Xprint MiniPay Dapp: This the main user facing dapp that allows users to interact with Xprint smartcontracts, make printing requests and payments with cUSD.
+- IPFS: Stores all data including printing service provder, printing requests, and documents.
 
-    - Xprint Desktop: This is an installable desktop dapp designed for service providers to interface between the physical printing infrastructure and also listens for printing requests on the blockchain.
+- Xprint MiniPay Dapp: This the main user facing dapp that allows users to interact with Xprint smartcontracts, make printing requests and payments with cUSD.
+
+- Xprint Desktop: This is an installable desktop dapp designed for service providers to interface between the physical printing infrastructure and also listens for printing requests on the blockchain.
+
+
+## Printing Service request processing
+1. A printing service provider (SME) register on the system using the desktop up and indicates the services it will provider
+2. An Xprint users via Minipay can request for a printing service, and make payments to a vault. 
+3. Once the printing services is processed and printed, the vault releases the payment to the service provider, and the user gets his/her document by delivery or pickup
