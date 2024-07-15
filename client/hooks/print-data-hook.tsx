@@ -3,7 +3,7 @@
 import { Print, Printer, printSchema } from '@/data/schema';
 import { createContext, ReactElement, useContext, useEffect, useState } from 'react'
 import { useStorageUpload } from "@thirdweb-dev/react";
-import { getHash, getPDFPageCount, getPrinterLogs, getPrintLogs, getPrintStatus } from '@/lib/utils';
+import { approvecUSD, getHash, getPDFPageCount, getPrinterLogs, getPrintLogs, getPrintStatus, issuePrintMinipay } from '@/lib/utils';
 import { bindTypes, jobStatuses, printTypes, statuses } from '@/data/data';
 import { formatUnits, parseUnits } from 'viem';
 import { useAccount, useWriteContract } from 'wagmi';
@@ -11,6 +11,7 @@ import { abi as xprintAbi, address as xprintAddress } from "../data/xprint-abi";
 import { abi as tokenAbi, address as tokenAddress } from "../data/token-abi";
 import { useStorage } from "@thirdweb-dev/react";
 import { access } from 'fs';
+import { useMiniPay } from './minipay-provider';
 
 const PrintContext = createContext({});
 
@@ -20,6 +21,7 @@ export function usePrint() {
     const { mutateAsync: upload } = useStorageUpload();
     const { writeContractAsync, context } = useWriteContract();
     const { address } = useAccount();
+    const { address: miniPayAddress } = useMiniPay();
 
     const uploadFileToIpfs = async (file: File) => {
         const uploadUrl = await upload({
@@ -86,7 +88,7 @@ export function usePrint() {
             const ipfsCID = ipfsURI.substring(0, ipfsURI.length - 1);
             // const hash = getHash(ipfsCID);
 
-            const amount = parseUnits(alldata?.cost as string, 6).toString();
+            const amount = parseUnits(alldata?.cost as string, process.env.NEXT_PUBLIC_TOKEN_DECIMALS).toString();
 
             // console.log('metadata', {
             //     ipfsCID,
@@ -95,46 +97,63 @@ export function usePrint() {
             //     amount,
             // });
 
-            const txn = await writeContractAsync({
-                abi: tokenAbi,
-                address: tokenAddress,
-                functionName: 'approve',
-                args: [
-                    xprintAddress,
-                    amount
-                ],
+            if (window && window.ethereum) {
+                // User has a injected wallet
 
-            }, {
-                onSuccess(data, variables, context) {
-                    writeContractAsync({
-                        abi: xprintAbi,
-                        address: xprintAddress,
-                        functionName: 'issuePrint',
-                        args: [
-                            alldata.printer.hash,
-                            address,
-                            amount,
-                            ipfsCID,
-                        ],
-                    }, {
-                        onSuccess(data, variables, context) {
-                            console.log(data);
-                        },
+                if (window.ethereum.isMiniPay) {
+                    const txn = await approvecUSD({
+                        senderAddress: miniPayAddress,
+                        tokenAddress: tokenAddress,
+                        receiverAddress: xprintAddress,
+                        transferValue: amount,
+                        tokenDecimals: process.env.NEXT_PUBLIC_TOKEN_DECIMALS
+                    });
+                    alert(txn);
+                    const printTxn = await issuePrintMinipay({
+                        owner: miniPayAddress,
+                        printerHash: alldata?.printer?.hash,
+                        amount,
+                        cid:ipfsCID 
                     })
+                    alert(printTxn)
+                }
+
+            } else {
+
+                const txn = await writeContractAsync({
+                    abi: tokenAbi,
+                    address: tokenAddress,
+                    functionName: 'approve',
+                    args: [
+                        xprintAddress,
+                        amount
+                    ],
+
+                }, {
+                    onSuccess(data, variables, context) {
+                        writeContractAsync({
+                            abi: xprintAbi,
+                            address: xprintAddress,
+                            functionName: 'issuePrint',
+                            args: [
+                                alldata.printer.hash,
+                                address,
+                                amount,
+                                ipfsCID,
+                            ],
+                        }, {
+                            onSuccess(data, variables, context) {
+                                console.log(data);
+                            },
+                        })
 
 
-                },
-            });
-
-            // console.log(txn);
-
-            //TODO: send payment to smart contract wallet
-
-            return {
-
+                    },
+                });
             }
         } catch (error) {
             console.log(error);
+            alert(error.message)
         } finally {
             setPrintFormLoading(false);
         }
@@ -167,7 +186,9 @@ export function PrintProvider({ children }: { children: ReactElement }) {
     const [formStep, setFormStep] = useState(1);
     const [form, setForm] = useState(null);
     const storage = useStorage();
-    const {address} = useAccount()
+    const { address } = useAccount();
+    const { address: miniPayAddress } = useMiniPay();
+
 
     const setPrintFormData = (newFieldData: {}) => {
         //TODO: validate data;
@@ -208,9 +229,10 @@ export function PrintProvider({ children }: { children: ReactElement }) {
 
     useEffect(() => {
         (async () => {
-            if(!address) return;
+            // alert(miniPayAddress, address);
+            if (!miniPayAddress && !address) return;
             try {
-                const [printerlogs, printLogs] = await Promise.all([getPrinterLogs(), getPrintLogs(address)])
+                const [printerlogs, printLogs] = await Promise.all([getPrinterLogs(), getPrintLogs(miniPayAddress || address)])
 
                 const [printers, prints] = await Promise.all(
                     [
@@ -219,17 +241,17 @@ export function PrintProvider({ children }: { children: ReactElement }) {
                             const dt = await storage?.downloadJSON(`ipfs://${printer?.cid}`)
                             if (dt.error) return null;
                             const { company: name, location } = dt.attributes?.reduce((acc, cur, next) => ({ ...acc, [cur.trait]: cur.value }), {})
-        
+
                             return { name, longitude: parseFloat(location?.longitude), latitude: parseFloat(location?.latitude), hash: printer?.printerHash };
                         })),
 
                         Promise.all(printLogs.map(async (print) => {
-                            if(!print?.docHash || !print?.printHash) return null;
+                            if (!print?.docHash || !print?.printHash) return null;
                             const [dt, statusIdx] = await Promise.all([storage?.downloadJSON(`ipfs://${print?.docHash}`), getPrintStatus(print?.printHash)]);
-                            const { cost, token} = dt.attributes?.reduce((acc, cur, arr) => ({...acc, [cur.name]: cur.value}), {});
-                            return {id: print.printHash, title: dt.name, cost, token, label: 'document', status: jobStatuses[statusIdx]}
+                            const { cost, token } = dt.attributes?.reduce((acc, cur, arr) => ({ ...acc, [cur.name]: cur.value }), {});
+                            return { id: print.printHash, title: dt.name, cost, token, label: 'document', status: jobStatuses[statusIdx] }
                         }))
-                        
+
                     ]
 
                 )
@@ -243,7 +265,7 @@ export function PrintProvider({ children }: { children: ReactElement }) {
             }
 
         })()
-    }, [])
+    }, [miniPayAddress, address])
 
     return (
         <PrintContext.Provider value={{

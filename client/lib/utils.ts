@@ -1,9 +1,10 @@
+
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { getContract, formatEther, createPublicClient, http, erc20Abi, Chain, encodeFunctionData, parseUnits, keccak256, stringToBytes, parseAbi } from "viem";
 import { createWalletClient, custom } from 'viem'
 import { PDFDocument } from 'pdf-lib';
-import {abi as xprintAbi, address as xprintAddress } from "@/data/xprint-abi";
+import { abi as xprintAbi, address as xprintAddress } from "@/data/xprint-abi";
 import { celo, celoAlfajores } from "viem/chains";
 
 export function cn(...inputs: ClassValue[]) {
@@ -12,10 +13,14 @@ export function cn(...inputs: ClassValue[]) {
 
 export const chain = process.env.NODE_ENV === "production" ? celo : celoAlfajores;
 
-export  const publicClient = createPublicClient({
-    chain,
-    transport: http(),
-  });
+
+
+export const publicClient = createPublicClient({
+  chain,
+  transport: http(),
+});
+
+
 
 export const getAddress = async () => {
   // The code must run in a browser environment and not in node environment
@@ -63,14 +68,14 @@ export const getAddresscUSDBalance = async (address: `0x${string}`, chain: Chain
   return balanceInEthers;
 }
 
-export const transfercUSD = async ({senderAddress, tokenAddress, receiverAddress, tokenDecimals, transferValue, chain}: {senderAddress: `0x${string}`,tokenAddress: `0x${string}`, receiverAddress: `0x${string}`, transferValue: BigInt, tokenDecimals: number, chain: Chain}) => {
+export const transfercUSD = async ({ senderAddress, tokenAddress, receiverAddress, tokenDecimals, transferValue, chain }: { senderAddress: `0x${string}`, tokenAddress: `0x${string}`, receiverAddress: `0x${string}`, transferValue: BigInt, tokenDecimals: number, chain: Chain }) => {
   const client = createWalletClient({
     chain,
     // chain: celo,
     transport: custom(window.ethereum!)
   })
-  
-  const publicClient = createPublicClient({ 
+
+  const publicClient = createPublicClient({
     chain,
     // chain: celo,
     transport: http()
@@ -107,13 +112,52 @@ export const transfercUSD = async ({senderAddress, tokenAddress, receiverAddress
     throw new Error("Transaction failed");
   }
 }
+export const approvecUSD = async ({ senderAddress, tokenAddress, receiverAddress,transferValue }: { senderAddress: `0x${string}`, tokenAddress: `0x${string}`, receiverAddress: `0x${string}`, transferValue: string }) => {
 
-export const transfercUSDFrom = async({fromAddress, tokenAddress, toAddress, tokenDecimals, transferValue, chain}: {fromAddress: `0x${string}`,tokenAddress: `0x${string}`, toAddress: `0x${string}`, transferValue: BigInt, tokenDecimals: number, chain: Chain}) => {
+  const client = createWalletClient({
+    chain,
+    // chain: celo,
+    transport: custom(window.ethereum!)
+  });
+
+  let hash = await client.sendTransaction({
+    account: senderAddress,
+    to: tokenAddress,
+    // to: '0x765DE816845861e75A25fCA122bb6898B8B1282a' // cUSD (Mainnet)
+    // to: '0xcebA9300f2b948710d2653dD7B07f33A8B32118C' // USDC (Mainnet)
+    // to: '0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e' // USDT (Mainnet)
+    data: encodeFunctionData({
+      abi: erc20Abi, // Token ABI can be fetched from Explorer.
+      functionName: "approve",
+      args: [
+        receiverAddress,
+        // Different tokens can have different decimals, cUSD (18), USDC (6)
+        transferValue,
+      ],
+    }),
+    // If the wallet is connected to a different network then you get an error.
+    chain,
+    // chain: celo,
+  });
+
+  const transaction = await publicClient.waitForTransactionReceipt({
+    hash, // Transaction hash that can be used to search transaction on the explorer.
+  });
+
+  if (transaction.status === "success") {
+    // Do something after transaction is successful.
+    return transaction.transactionHash;
+  } else {
+    // Do something after transaction has failed.
+    throw new Error("Transaction failed");
+  }
+}
+
+export const transfercUSDFrom = async ({ fromAddress, tokenAddress, toAddress, tokenDecimals, transferValue, chain }: { fromAddress: `0x${string}`, tokenAddress: `0x${string}`, toAddress: `0x${string}`, transferValue: BigInt, tokenDecimals: number, chain: Chain }) => {
   const client = createWalletClient({
     chain,
     transport: custom(window.ethereum!)
   })
-  
 
   let hash = await client.sendTransaction({
     account: toAddress,
@@ -149,7 +193,47 @@ export const transfercUSDFrom = async({fromAddress, tokenAddress, toAddress, tok
   }
 }
 
-export const readFile = (file: File) : Promise<ArrayBuffer|string|null>  => {
+export const issuePrintMinipay = async ({ owner, printerHash, cid, amount, tokenDecimals }: { owner: `0x${string}`, printerHash: `0x${string}`, amount: string, cid: string }) => {
+  const client = createWalletClient({
+    chain,
+    transport: custom(window.ethereum!)
+  })
+
+  let hash = await client.sendTransaction({
+    account: owner,
+    to: xprintAddress,
+    // to: '0x765DE816845861e75A25fCA122bb6898B8B1282a' // cUSD (Mainnet)
+    // to: '0xcebA9300f2b948710d2653dD7B07f33A8B32118C' // USDC (Mainnet)
+    // to: '0x48065fbbe25f71c9282ddf5e1cd6d6a887483d5e' // USDT (Mainnet)
+    data: encodeFunctionData({
+      abi: xprintAbi, // Token ABI can be fetched from Explorer.
+      functionName: "issuePrint",
+      args: [
+        printerHash,
+        owner,
+        parseUnits(`${Number(amount)}`, tokenDecimals),
+        cid,
+      ],
+    }),
+    // If the wallet is connected to a different network then you get an error.
+    chain,
+    // chain: celo,
+  });
+
+  const transaction = await publicClient.waitForTransactionReceipt({
+    hash, // Transaction hash that can be used to search transaction on the explorer.
+  });
+
+  if (transaction.status === "success") {
+    // Do something after transaction is successful.
+    return transaction.transactionHash;
+  } else {
+    // Do something after transaction has failed.
+    throw new Error("Transaction failed");
+  }
+}
+
+export const readFile = (file: File): Promise<ArrayBuffer | string | null> => {
 
   return new Promise((resolve, reject) => {
 
@@ -167,7 +251,7 @@ export const getHash = (str: string) => {
 }
 
 
-export const getPrinterLogs = async() => {
+export const getPrinterLogs = async () => {
 
   const events = await publicClient.getContractEvents({
     abi: xprintAbi,
@@ -175,15 +259,15 @@ export const getPrinterLogs = async() => {
     eventName: 'PrinterCreated',
     fromBlock: 0n,
   })
-  
+
   const printersLog = events?.map(event => event?.args);
-  
+
   return printersLog;
 }
 
-export const getPrintStatus = async(printHash: `$0x${string}`) => {
-  
-  const result =  await publicClient.readContract({
+export const getPrintStatus = async (printHash: `$0x${string}`) => {
+
+  const result = await publicClient.readContract({
     abi: xprintAbi,
     address: xprintAddress,
     functionName: "getJobStatus",
@@ -194,22 +278,22 @@ export const getPrintStatus = async(printHash: `$0x${string}`) => {
 }
 
 
-export const getPrintLogs = async(address: `0x${string}`) => {
+export const getPrintLogs = async (address: `0x${string}`) => {
   const events = await publicClient.getContractEvents({
     abi: xprintAbi,
     address: xprintAddress,
     eventName: 'JobIssued',
     fromBlock: 0n,
   })
-  
+
   const printLog = events?.map(event => event?.args);
-  
+
   return printLog;
 }
 
 export const getPDFPageCount = async (file: File) => {
 
-  const arrayBuffer = await readFile(file) as ArrayBuffer|string;
+  const arrayBuffer = await readFile(file) as ArrayBuffer | string;
 
   const pdf = await PDFDocument.load(arrayBuffer);
 
