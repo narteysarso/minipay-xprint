@@ -229,7 +229,6 @@ export function PrintProvider({ children }: { children: ReactElement }) {
 
     useEffect(() => {
         (async () => {
-            // alert(miniPayAddress, address);
             if (!miniPayAddress && !address) return;
             try {
                 const [printerlogs, printLogs] = await Promise.all([getPrinterLogs(), getPrintLogs(miniPayAddress || address)])
@@ -255,6 +254,8 @@ export function PrintProvider({ children }: { children: ReactElement }) {
                     ]
 
                 )
+
+                console.log({printerlogs, printLogs});
 
                 setPrinters(printers.filter((printer) => printer));
                 setPrints(prints.filter((print) => print));

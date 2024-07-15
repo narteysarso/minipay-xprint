@@ -252,7 +252,7 @@ export const getHash = (str: string) => {
 
 
 export const getPrinterLogs = async () => {
-
+  console.log('getting printers logs')
   const events = await publicClient.getContractEvents({
     abi: xprintAbi,
     address: xprintAddress,
@@ -261,6 +261,8 @@ export const getPrinterLogs = async () => {
   })
 
   const printersLog = events?.map(event => event?.args);
+
+  console.log({printersLog})
 
   return printersLog;
 }
@@ -279,6 +281,7 @@ export const getPrintStatus = async (printHash: `$0x${string}`) => {
 
 
 export const getPrintLogs = async (address: `0x${string}`) => {
+  console.log('getting print logs')
   const events = await publicClient.getContractEvents({
     abi: xprintAbi,
     address: xprintAddress,
@@ -287,7 +290,7 @@ export const getPrintLogs = async (address: `0x${string}`) => {
   })
 
   const printLog = events?.map(event => event?.args);
-
+  console.log({printLog})
   return printLog;
 }
 
