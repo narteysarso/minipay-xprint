@@ -15,8 +15,6 @@ export function cn(...inputs: ClassValue[]) {
 
 export const chain = process.env.NODE_ENV === "production" ? celo : celoAlfajores;
 
-
-
 export const publicClient = createPublicClient({
   chain,
   transport: http(),

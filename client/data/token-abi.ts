@@ -1,4 +1,4 @@
-export const address = process.env.NEXT_PUBLIC_STABLE_TOKEN_ADDRESS;
+export const address = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_CUSD_STABLE_TOKEN_ADDRESS : process.env.NEXT_PUBLIC_STABLE_TOKEN_ADDRESS;
 
 export const abi = [
 	{

@@ -1,4 +1,4 @@
-export const address = process.env.NEXT_PUBLIC_XPRINT_CONTRACT_ADDRESS;
+export const address = process.env.NODE_ENV === "production" ? process.env.NEXT_PUBLIC_XPRINT_CELO_CONTRACT_ADDRESS : process.env.NEXT_PUBLIC_XPRINT_ALFAJORES_CONTRACT_ADDRESS;
 
 export const abi =  [
     {
