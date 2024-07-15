@@ -36,4 +36,4 @@ Xprints architecture are made up of the following parts
 - Ant Design
 - Minipay
 - Solidity
-- 
+- electron
