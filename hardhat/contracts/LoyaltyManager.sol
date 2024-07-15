@@ -17,6 +17,7 @@ contract LoyaltyManager{
         _;
     }
 
+
     function _setRedeemToken(address token) internal {
         require(token != address(0) && token != address(this),"Invalid redeem address");
         redeemToken = token;

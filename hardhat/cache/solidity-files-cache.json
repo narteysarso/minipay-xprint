@@ -38,7 +38,7 @@
       ]
     },
     "/home/workstation/projects/Xprint/hardhat/contracts/Xprint.sol": {
-      "lastModificationDate": 1720968640018,
+      "lastModificationDate": 1721054216933,
       "contentHash": "6f46ce0761280c09dd59b2436a347561",
       "sourceName": "contracts/Xprint.sol",
       "solcConfig": {
@@ -80,8 +80,8 @@
       ]
     },
     "/home/workstation/projects/Xprint/hardhat/contracts/PaymentManager.sol": {
-      "lastModificationDate": 1720970965308,
-      "contentHash": "04bf17200d7dde1e3b3c524bc3cef67c",
+      "lastModificationDate": 1721054043463,
+      "contentHash": "8fe10d3a24365de5b8de7cd3f9fc268e",
       "sourceName": "contracts/PaymentManager.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -155,8 +155,8 @@
       ]
     },
     "/home/workstation/projects/Xprint/hardhat/contracts/LoyaltyManager.sol": {
-      "lastModificationDate": 1720970906228,
-      "contentHash": "d8464d3fd8165fcfc58520ff565e33d9",
+      "lastModificationDate": 1721054027403,
+      "contentHash": "73681543bc31bd45a844612c3c026b2b",
       "sourceName": "contracts/LoyaltyManager.sol",
       "solcConfig": {
         "version": "0.8.20",

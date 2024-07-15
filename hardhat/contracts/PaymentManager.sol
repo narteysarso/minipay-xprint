@@ -91,7 +91,7 @@ contract PaymentManager {
         token = token_;
     }
 
-    function getPaymentToken() external view returns (address){
+    function paymentToken() external view returns(address) {
         return token;
     }
 
@@ -99,6 +99,8 @@ contract PaymentManager {
         return printBalances[printHash];
     }
 
-
+    function paymentStatus(bytes32 printHash) external view returns(PaymentStatus){
+        return paymentStatuses[printHash];
+    }
 
 }

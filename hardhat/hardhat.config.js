@@ -24,7 +24,8 @@ module.exports = {
   },
   etherscan: {
     apiKey:{
-      alfajores: process.env.CELO_SCAN_API_KEY
+      alfajores: process.env.CELO_SCAN_API_KEY,
+      celo: process.env.CELO_SCAN_API_KEY,
     },
     customChains: [
       {
@@ -33,6 +34,14 @@ module.exports = {
         urls: {
           apiURL: "https://api-alfajores.celoscan.io/api",
           browserURL: "https://alfajores.celoscan.io/"
+        }
+      },
+      {
+        network: "celo",
+        chainId: 42220,
+        urls: {
+          apiURL: "https://api.celoscan.io/api",
+          browserURL: "https://celoscan.io/"
         }
       }
     ]
