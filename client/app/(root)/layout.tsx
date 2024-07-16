@@ -11,11 +11,9 @@ import {
 import '@rainbow-me/rainbowkit/styles.css';
 
 export const config = createConfig({
-  chains: [celo, celoAlfajores, localhost],
+  chains: [celo],
   transports: {
     [celo.id]: http(),
-    [celoAlfajores.id]: http(),
-    [localhost.id]: http(),
   },
 })
 
